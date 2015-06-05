@@ -14,13 +14,21 @@ var powerups;
 // Declarations
 var timeSinceLastFrame = 0;
 var mapObjects = [];
+var projectiles = [];
 var right = 0;
 var left = 1;
 var up = 2;
 var down = 3;
 
 // Images
+var eggImage = new Image();
+eggImage.src = "images/egg.png";
 var snakeImages = [];
+var shotImage = [];
+for(image = 0; image < 4; image++) {
+    shotImage[image] = new Image();
+    shotImage[image].src = "images/shot" + image + ".png";
+}
 for(image = 0; image < 12; image++) {
     snakeImages[image] = new Image();
     snakeImages[image].src = "images/" + image + ".png";
@@ -104,6 +112,13 @@ var update = function() {
 // Draws the current snake
 function drawSnake() {
     // img, x, y, width, height
+    // Drawing projectiles
+    for(index = 0; index < projectiles.length; index++) {
+        context.drawImage(shotImage[projectiles[index][2]], 
+                projectiles[index][0] * tileWidth,
+                projectiles[index][1] * tileWidth, 
+                tileWidth, tileWidth);
+    }
     // If snake needs more than head and tail
     if(snake.length > 2) {
         // Drawing body pieces
@@ -126,29 +141,41 @@ function drawSnake() {
                 snake[snake.length - 1][1] * tileWidth, tileWidth, tileWidth);
     // Drawing powerups
     for(index = 0; index < powerups.length; index++) {
-        context.fillStyle = "yellow";
-        context.fillRect(powerups[index][0] * tileWidth, 
+        context.drawImage(eggImage, powerups[index][0] * tileWidth, 
                 powerups[index][1] * tileWidth, tileWidth, tileWidth);
     }
 };
 
 // Keyboard press
 function keyDown(event) {
-    // "W" Pressed
-    if(event.charCode === 119) {
+    // "W" or Up arrow
+    if(event.keyCode === 87 || event.keyCode === 38) {
         snake[snake.length - 1].direction = up;
-    // "D" Pressed
-    } else if(event.charCode === 100) {
+    // "D" or Right arrow
+    } else if(event.keyCode === 68 || event.keyCode === 39) {
         snake[snake.length - 1].direction = right;
-    // "S" Pressed
-    } else if(event.charCode === 115) {
+    // "S" or Down arrow
+    } else if(event.keyCode === 83 || event.keyCode === 40) {
         snake[snake.length - 1].direction = down;
-    // "A" Pressed
-    } else if(event.charCode === 97) {
+    // "A" or Left arrow
+    } else if(event.keyCode === 65 || event.keyCode === 37) {
         snake[snake.length - 1].direction = left;
+    // "Space" bar
+    } else if(event.keyCode === 32) {
+        createProjectile();
     } else {
-        console.log("Unused key: " + event.charCode);
+        console.log("Unused key: " + event.keyCode);
     }
+    requestAnimationFrame(update);
+};
+
+// New projectile
+function createProjectile() {
+    var projectile = [];
+    projectile[0] = snake[snake.length - 1][0];
+    projectile[1] = snake[snake.length - 1][1];
+    projectile[2] = snake[snake.length - 1].direction;
+    projectiles.push(projectile);
     requestAnimationFrame(update);
 };
 
@@ -223,12 +250,33 @@ function snakeMove() {
     requestAnimationFrame(update);
 };
 
+// Moves all projectiles
+function projectileMove() {
+    if(projectiles.length !== 0) {
+        for(index = 0; index < projectiles.length; index++) {
+            // Moving right
+            if(projectiles[index][2] === 0) {
+                projectiles[index][0] += 1;
+            // Moving left
+            } else if(projectiles[index][2] === 1) {
+                projectiles[index][0] -= 1;
+            // Moving up
+            } else if(projectiles[index][2] === 2) {
+                projectiles[index][1] -= 1;
+            // Moving down
+            } else { 
+                projectiles[index][1] += 1;
+            }
+        }
+    }
+};
+
 // Resetting game
 function restart() {
     console.log("Restarting"); // DEBUG
     snake = [[5, 5]];
     snake[0].direction = right;
-    powerups = [[30, 30]];
+    powerups = [[30, 30], [20, 10], [25, 5]];
 }
 
 // At load time
@@ -236,10 +284,11 @@ window.onload = function() {
     restart();
     lastFrameTimer();
     orient();
-    window.addEventListener("keypress", keyDown);
+    window.addEventListener("keydown", keyDown);
     
     background = new rectangle(0, 0, canvas.width, canvas.height, "black");
     mapObjects.push(background);
     
     window.setInterval(snakeMove, 1000/10);
+    window.setInterval(projectileMove, 1000/20);
 };
