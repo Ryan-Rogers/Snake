@@ -14,6 +14,17 @@ var powerups;
 // Declarations
 var timeSinceLastFrame = 0;
 var mapObjects = [];
+var right = 0;
+var left = 1;
+var up = 2;
+var down = 3;
+
+// Images
+var snakeImages = [];
+for(image = 0; image < 12; image++) {
+    snakeImages[image] = new Image();
+    snakeImages[image].src = "images/" + image + ".png";
+}
 
 // Updates timeSinceLastFrame every 1000/60 ms
 var lastFrameTimer = function() {
@@ -92,11 +103,28 @@ var update = function() {
 
 // Draws the current snake
 function drawSnake() {
-    for(index = 0; index < snake.length; index++) {
-        context.fillStyle = "white";
-        context.fillRect(snake[index][0] * tileWidth, 
-                snake[index][1] * tileWidth, tileWidth, tileWidth);
+    // img, x, y, width, height
+    // If snake needs more than head and tail
+    if(snake.length > 2) {
+        // Drawing body pieces
+        for(index = 1; index < snake.length - 1; index++) {
+            context.drawImage(snakeImages[8 + snake[index].direction], 
+                    snake[index][0] * tileWidth, snake[index][1] * tileWidth, 
+                    tileWidth, tileWidth);
+        }
     }
+    // If snake needs a tail
+    if(snake.length > 1) {
+        // Drawing tail
+        context.drawImage(snakeImages[4 + snake[0].direction], 
+                    snake[0][0] * tileWidth, snake[0][1] * tileWidth, 
+                    tileWidth, tileWidth);
+    }
+    // Drawing head
+    context.drawImage(snakeImages[snake[snake.length - 1].direction], 
+                snake[snake.length - 1][0] * tileWidth, 
+                snake[snake.length - 1][1] * tileWidth, tileWidth, tileWidth);
+    // Drawing powerups
     for(index = 0; index < powerups.length; index++) {
         context.fillStyle = "yellow";
         context.fillRect(powerups[index][0] * tileWidth, 
@@ -108,16 +136,16 @@ function drawSnake() {
 function keyDown(event) {
     // "W" Pressed
     if(event.charCode === 119) {
-        direction = "up";
+        snake[snake.length - 1].direction = up;
     // "D" Pressed
     } else if(event.charCode === 100) {
-        direction = "right";
+        snake[snake.length - 1].direction = right;
     // "S" Pressed
     } else if(event.charCode === 115) {
-        direction = "down";
+        snake[snake.length - 1].direction = down;
     // "A" Pressed
     } else if(event.charCode === 97) {
-        direction = "left";
+        snake[snake.length - 1].direction = left;
     } else {
         console.log("Unused key: " + event.charCode);
     }
@@ -136,19 +164,23 @@ function createPowerup() {
 // Moves the snake along
 function snakeMove() {
     var snakeLink = [];
-    if(direction === "up") {
+    if(snake[snake.length - 1].direction === up) {
         snakeLink.push(snake[snake.length - 1][0]);
         snakeLink.push(snake[snake.length - 1][1] - 1);
-    } else if(direction === "down") {
+        snakeLink.direction = up;
+    } else if(snake[snake.length - 1].direction === down) {
         snakeLink.push(snake[snake.length - 1][0]);
         snakeLink.push(snake[snake.length - 1][1] + 1);
-    } else if(direction === "left") {
+        snakeLink.direction = down;
+    } else if(snake[snake.length - 1].direction === left) {
         snakeLink.push(snake[snake.length - 1][0] - 1);
         snakeLink.push(snake[snake.length - 1][1]);
+        snakeLink.direction = left;
     // Direction is right
     } else {
         snakeLink.push(snake[snake.length - 1][0] + 1);
         snakeLink.push(snake[snake.length - 1][1]);
+        snakeLink.direction = right;
     }
     // Moving snake forward
     snake.push(snakeLink);
@@ -193,8 +225,9 @@ function snakeMove() {
 
 // Resetting game
 function restart() {
-    direction = "right";
+    console.log("Restarting"); // DEBUG
     snake = [[5, 5]];
+    snake[0].direction = right;
     powerups = [[30, 30]];
 }
 
@@ -208,5 +241,5 @@ window.onload = function() {
     background = new rectangle(0, 0, canvas.width, canvas.height, "black");
     mapObjects.push(background);
     
-    window.setInterval(snakeMove, 1000/15);
+    window.setInterval(snakeMove, 1000/10);
 };
