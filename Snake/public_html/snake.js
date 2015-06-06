@@ -87,7 +87,7 @@ var orient = function(){
         canvas.width = (window.innerHeight / 9) * 16;
         canvas.height = window.innerHeight;
         landscape = true;
-        tileWidth = canvas.width / 32;
+        tileWidth = canvas.width / 64;
     }
 };
 
