@@ -94,10 +94,10 @@ var orient = function(){
 var update = function() {
     // x, y, width, height
     if(timeSinceLastFrame > 0) {
-        timeSinceLastFrame = 0;
         context.fillStyle = "black";
         context.fillRect(0, 0, canvas.width, canvas.height);
         drawSnake();
+        timeSinceLastFrame = 0;
     }
 };
 
@@ -128,10 +128,10 @@ function drawSnake() {
     }
     // Drawing text
     context.fillStyle = "white";
-    context.font = "12px Arial";
+    context.font = canvas.width / 50 + "px Arial";
     context.fillText("Longest: " + longestSnake, canvas.width/100,
             canvas.height/1.02);
-    context.fillText("Current: " + snake.length, canvas.width/10,
+    context.fillText("Current: " + snake.length, canvas.width/7,
             canvas.height/1.02);
 };
 
@@ -230,6 +230,23 @@ function createPowerup(type) {
     }
 };
 
+// Checking if a snake has collided with itself
+function overlap(inputSnake) {
+    // Ensuring the snake is capable of overlapping
+    if(inputSnake.length > 3) {
+        // Iterating over every link
+        for(index = 0; index < inputSnake.length - 1; index++) {
+            // Checking for overlap
+            if(inputSnake[index][0] === inputSnake[inputSnake.length - 1][0]
+                    && inputSnake[index][1]
+                    === inputSnake[inputSnake.length - 1][1]) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
 // Moving the given snake
 function moveSnake(inputSnake) {
     var snakeLink = [];
@@ -261,16 +278,7 @@ function moveSnake(inputSnake) {
         return false;
     // Checking if snake has eaten itself
     } else {
-        var restartRequired = false;
-        if(inputSnake.length > 3) {
-            for(index = 0; index < inputSnake.length - 1; index++) {
-                if(inputSnake[index][0] === inputSnake[inputSnake.length - 1][0]
-                        && inputSnake[index][1] === inputSnake[inputSnake.length - 1][1]) {
-                    restartRequired = true;
-                }
-            }
-        }
-        if(restartRequired) {
+        if(overlap(inputSnake)) {
             return false;
         // Checking if powerup has been eaten
         } else {
@@ -358,7 +366,6 @@ function projectileMove() {
 
 // Resetting game
 function restart() {
-    console.log("Restarting"); // DEBUG
     snake = [[5, 5]];
     snake[0].direction = right;
     powerups = [[30, 30], [20, 10], [25, 5]];
