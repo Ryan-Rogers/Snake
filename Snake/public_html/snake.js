@@ -13,7 +13,6 @@ var powerups;
 
 // Declarations
 var timeSinceLastFrame = 0;
-var mapObjects = [];
 var projectiles = [];
 var right = 0;
 var left = 1;
@@ -91,29 +90,13 @@ var orient = function(){
     }
 };
 
-// Called to redraw every object in mapObjects
+// Called to redraw every object
 var update = function() {
     // x, y, width, height
     if(timeSinceLastFrame > 0) {
         timeSinceLastFrame = 0;
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        for(index = 0; index < mapObjects.length; index++) {
-            if(mapObjects[index] instanceof sprite) {
-                // image, frameX, frameY, frameWidth, frameHeight,
-                //      x, y, width, height
-                context.drawImage(mapObjects[index].image,
-                        mapObjects[index].frame * mapObjects[index].width,
-                        mapObjects[index].animation * mapObjects[index].height,
-                        mapObjects[index].width, mapObjects[index].height,
-                        mapObjects[index].x, mapObjects[index].y,
-                        mapObjects[index].width, mapObjects[index].height);
-            } else {
-                context.fillStyle = mapObjects[index].color;
-                // x, y, width, height
-                context.fillRect(mapObjects[index].x, mapObjects[index].y,
-                        mapObjects[index].width, mapObjects[index].height);
-            }
-        }
+        context.fillStyle = "black";
+        context.fillRect(0, 0, canvas.width, canvas.height);
         drawSnake();
     }
 };
@@ -388,10 +371,6 @@ window.onload = function() {
     lastFrameTimer();
     orient();
     window.addEventListener("keydown", keyDown);
-    
-    background = new rectangle(0, 0, canvas.width, canvas.height, "black");
-    mapObjects.push(background);
-    
     window.setInterval(snakeMove, 1000/10);
     window.setInterval(projectileMove, 1000/20);
     window.setInterval(function() {
