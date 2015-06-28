@@ -10,6 +10,7 @@ var direction;
 var tileWidth;
 var snake;
 var powerups;
+var canvasDisplay;
 
 // Declarations
 var timeSinceLastFrame = 0;
@@ -21,28 +22,43 @@ var down = 3;
 var longestSnake = 1;
 var mirrorSnake = false;
 var increaseSnake = 0;
+var paused = true;
 
 // Images
 var eggImage = new Image();
-eggImage.src = "images/egg.png";
+eggImage.src = "snake/images/egg.png";
 var ringImage = new Image();
-ringImage.src = "images/ring.png";
+ringImage.src = "snake/images/ring.png";
 var rings = [];
 var shotImage = [];
 for(image = 0; image < 4; image++) {
     shotImage[image] = new Image();
-    shotImage[image].src = "images/shot" + image + ".png";
+    shotImage[image].src = "snake/images/shot" + image + ".png";
 }
 var snakeImages = [];
 for(image = 0; image < 12; image++) {
     snakeImages[image] = new Image();
-    snakeImages[image].src = "images/" + image + ".png";
+    snakeImages[image].src = "snake/images/" + image + ".png";
 }
 var invertedImages = [];
 for(image = 0; image < 12; image++) {
     invertedImages[image] = new Image();
-    invertedImages[image].src = "inverted/" + image + ".png";
+    invertedImages[image].src = "snake/inverted/" + image + ".png";
 }
+
+// Play button
+var disableCanvas = function() {
+    if(canvas.style.display === "none") {
+        canvas.style.display = canvasDisplay;
+        document.getElementById("playButton").value="Close";
+        paused = false;
+    } else {
+        canvasDisplay = canvas.style.display;
+        canvas.style.display = "none";
+        document.getElementById("playButton").value="Play";
+        paused = true;
+    }
+};
 
 // Updates timeSinceLastFrame every 1000/60 ms
 var lastFrameTimer = function() {
@@ -93,7 +109,7 @@ var orient = function(){
 // Called to redraw every object
 var update = function() {
     // x, y, width, height
-    if(timeSinceLastFrame > 0) {
+    if(!paused && timeSinceLastFrame > 0) {
         context.fillStyle = "black";
         context.fillRect(0, 0, canvas.width, canvas.height);
         drawSnake();
@@ -329,16 +345,27 @@ function moveSnake(inputSnake) {
 
 // Moves the snake along
 function snakeMove() {
-    if(moveSnake(snake)) {
-        requestAnimationFrame(update);
-    } else {
-        restart();
-    }
-    if(mirrorSnake) {
-        if(moveSnake(mirrorSnake)) {
+    if(!paused) {
+        // Checking if snake is still alive
+        if(moveSnake(snake)) {
+            // Requesting frame for snakes new position
             requestAnimationFrame(update);
+        // Snake has died
         } else {
-            mirrorSnake = false;
+            // Restarting game
+            restart();
+        }
+        // Checking if mirror snake was spawned
+        if(mirrorSnake) {
+            // Checking if mirror snake is still alive
+            if(moveSnake(mirrorSnake)) {
+                // Requesting frame for mirror snakes new position
+                requestAnimationFrame(update);
+            // Mirror snake died
+            } else {
+                // Despawning dead snake
+                mirrorSnake = false;
+            }
         }
     }
 };
@@ -374,6 +401,7 @@ function restart() {
 
 // At load time
 window.onload = function() {
+    disableCanvas();
     restart();
     lastFrameTimer();
     orient();
