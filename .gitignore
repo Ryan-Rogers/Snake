@@ -44,10 +44,10 @@ Temporary Items
 /Snake/nbproject/private/
 
 # Files created by NetBeans
-/Snake/test
-/Snake/nbproject/project.properties
-/Snake/nbproject/project.xml
+*.properties
+*.xml
 /Snake/nbproject/
+/Snake/test
 
 # Website files
 /Snake/public_html/snake/index.html
