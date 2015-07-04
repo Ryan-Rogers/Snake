@@ -42,3 +42,10 @@ Network Trash Folder
 Temporary Items
 .apdisk
 /Snake/nbproject/private/
+
+# Files created by NetBeans
+/Snake/nbproject
+/Snake/test
+
+# Website files
+/Snake/public_html/snake/index.html

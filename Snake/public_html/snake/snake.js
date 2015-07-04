@@ -1,10 +1,7 @@
 
-// Canvas
-var canvas = document.querySelector("canvas");
-document.body.appendChild(canvas);
-var context = canvas.getContext("2d");
-
 // Initializations
+var canvas;
+var context;
 var landscape;
 var direction;
 var tileWidth;
@@ -22,43 +19,52 @@ var down = 3;
 var longestSnake = 1;
 var mirrorSnake = false;
 var increaseSnake = 0;
-var paused = true;
+var paused = false;
 
 // Images
 var eggImage = new Image();
-eggImage.src = "snake/images/egg.png";
+eggImage.src = "images/egg.png";
 var ringImage = new Image();
-ringImage.src = "snake/images/ring.png";
+ringImage.src = "images/ring.png";
 var rings = [];
 var shotImage = [];
 for(image = 0; image < 4; image++) {
     shotImage[image] = new Image();
-    shotImage[image].src = "snake/images/shot" + image + ".png";
+    shotImage[image].src = "images/shot" + image + ".png";
 }
 var snakeImages = [];
 for(image = 0; image < 12; image++) {
     snakeImages[image] = new Image();
-    snakeImages[image].src = "snake/images/" + image + ".png";
+    snakeImages[image].src = "images/" + image + ".png";
 }
 var invertedImages = [];
 for(image = 0; image < 12; image++) {
     invertedImages[image] = new Image();
-    invertedImages[image].src = "snake/inverted/" + image + ".png";
+    invertedImages[image].src = "inverted/" + image + ".png";
 }
 
+// Creating canvas and context
+canvas = document.createElement("canvas");
+context = canvas.getContext("2d");
+document.body.appendChild(canvas);
+
+/*
 // Play button
-var disableCanvas = function() {
+var toggleSnakeCanvas = function() {
+    // Enabling canvas
     if(canvas.style.display === "none") {
         canvas.style.display = canvasDisplay;
-        document.getElementById("playButton").value="Close";
+        document.getElementById("snakeButton").value="Close";
         paused = false;
+    // Disabling canvas
     } else {
         canvasDisplay = canvas.style.display;
         canvas.style.display = "none";
-        document.getElementById("playButton").value="Play";
+        document.getElementById("snakeButton").value="Play";
         paused = true;
     }
 };
+*/
 
 // Updates timeSinceLastFrame every 1000/60 ms
 var lastFrameTimer = function() {
@@ -401,7 +407,7 @@ function restart() {
 
 // At load time
 window.onload = function() {
-    disableCanvas();
+    // toggleSnakeCanvas();
     restart();
     lastFrameTimer();
     orient();
